@@ -1,0 +1,15 @@
+server:
+  port: 6421
+spring:
+  config:
+    activate:
+      on-profile: local
+    import: optional:file:.env.local[.properties]
+  redis:
+    host: localhost
+    port: 6379
+clients:
+  marketdata:
+    url:  https://marketdataservice.stg.changeinvest.cloud
+  wallet:
+    url: https://wallet.stg.changeinvest.cloud

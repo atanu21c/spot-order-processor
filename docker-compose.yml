@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14.2-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=spot_order
+    ports:
+      - '5469:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+  zookeeper:
+    image: zookeeper
+    restart: always
+    hostname: zoo1
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181
+  kafka:
+    image: nyadesu/kafka-docker
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: LOCAL://localhost:9092,DOCKER://host.docker.internal:9093
+      KAFKA_LISTENERS: LOCAL://0.0.0.0:9092,DOCKER://0.0.0.0:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LOCAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LOCAL
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_BROKER_ID: 1001
+      KAFKA_RESERVED_BROKER_MAX_ID: 1001
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 29092:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    depends_on:
+      - "zookeeper"
+      - "kafka"
+  redis:
+    image: redis:alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis:/data
+volumes:
+  redis: ~
+  db: ~

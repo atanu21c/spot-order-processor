@@ -1,0 +1,30 @@
+server:
+  port: 6421
+
+spring:
+  # Kafka configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: all
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${APP_DATABASE_USERNAME}
+    password: ${APP_DATABASE_PASSWORD}
+  flyway:
+    url: ${DATABASE_URL}
+    user: ${FLYWAY_DATABASE_USERNAME}
+    password: ${FLYWAY_DATABASE_PASSWORD}
+    out-of-order: true
+    sql-migration-prefix: ~
+    locations: classpath:db/migration
+
+# Kafka Topics
+kraken:
+  topic:
+    name: spot-order.kraken-order
+primexm:
+  topic:
+    name: spot-order.primexm-order
